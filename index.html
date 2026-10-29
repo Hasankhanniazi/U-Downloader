@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b0f19">
   <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="description" content="LOOX Media Grab helps you access public Instagram, TikTok and X media. Paste a link or share it directly from Android.">
-  <title>LOOX Media Grab – Instagram, TikTok & X Downloader</title>
+  <meta name="description" content="U-Downloader helps you access public Instagram, X, Pinterest and TikTok media. Paste a link or share it directly from Android.">
+  <title>U-Downloader — Social Media Downloader</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -329,6 +329,12 @@
       color: #bbf7d0;
       background: #14532d33;
       border: 1px solid #22c55e44;
+    }
+
+    .message.info {
+      color: #dbeafe;
+      background: #1e3a5f55;
+      border: 1px solid #60a5fa44;
     }
 
     .result-link {
@@ -766,16 +772,14 @@
 
 <header>
   <div class="container navbar">
-    <a href="#" class="logo" aria-label="LOOX Media Grab home">
-      <span class="logo-mark">L</span>
-      <span>LOOX<small>MEDIA GRAB</small></span>
+    <a href="#" class="logo" aria-label="U-Downloader home">
+      <span class="logo-mark">U</span>
+      <span>U-Downloader</span>
     </a>
 
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="#downloader">Downloader</a>
       <a href="#how-it-works">How it works</a>
       <a href="#features">Features</a>
-      <a href="#faq">FAQ</a>
       <a href="#downloader" class="nav-cta">Get Started ↗</a>
     </nav>
   </div>
@@ -795,8 +799,8 @@
       </h1>
 
       <p class="hero-description">
-        Download public Instagram videos, Reels, TikTok and X media with a
-        simple interface. Paste a link or share it directly to LOOX from Android.
+        Download public Instagram, X/Twitter, Pinterest and TikTok media with a
+        simple interface. Paste a link or share it directly to U-Downloader from Android.
       </p>
 
       <div class="downloader">
@@ -846,15 +850,15 @@
         </p>
         <p class="privacy-note" style="margin-top:8px">
           <span aria-hidden="true">📲</span>
-          Android tip: install LOOX from your browser menu, then use Share → LOOX on a supported post.
+          Android tip: install U-Downloader from your browser menu, then use Share → U-Downloader on a supported post.
         </p>
       </div>
 
       <div class="platforms" aria-label="Supported media">
         <span class="platform">◎ Instagram</span>
-        <span class="platform">♪ TikTok</span>
         <span class="platform">✦ X / Twitter</span>
-        <span class="platform">↗ Mobile friendly</span>
+        <span class="platform">📌 Pinterest</span>
+        <span class="platform">♪ TikTok</span>
       </div>
     </div>
   </section>
@@ -991,11 +995,11 @@
   <div class="container footer-inner">
     <div>
       <a href="#" class="logo">
-        <span class="logo-mark">L</span>
-        <span>LOOX<small>MEDIA GRAB</small></span>
+        <span class="logo-mark">U</span>
+        <span>U-Downloader</span>
       </a>
       <p class="footer-copy">
-        © <span id="year"></span> LOOX Media Grab. All rights reserved.
+        © <span id="year"></span> U-Downloader. All rights reserved.
       </p>
     </div>
 
@@ -1052,6 +1056,10 @@
       if (url.protocol !== "https:" && url.protocol !== "http:") return false;
       if (host === "instagram.com" || host === "instagr.am") {
         return /^\/(p|reel|reels|tv)\/[A-Za-z0-9_-]+\/?$/.test(url.pathname);
+      }
+      if (host === "pinterest.com" || host.endsWith(".pinterest.com") || host === "pin.it") {
+        if (host === "pin.it") return url.pathname !== "/" && url.pathname.length > 1;
+        return /^\/pin\/[A-Za-z0-9_-]+\/?$/.test(url.pathname);
       }
       if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
         return url.pathname !== "/" && url.pathname.length > 1;
@@ -1143,10 +1151,11 @@
   async function processUrl(rawUrl) {
     const url = rawUrl.trim();
     if (!safePlatformUrl(url)) {
-      setMessage("Please enter a valid public Instagram, TikTok, or X post link.", "error");
+      setMessage("Please enter a valid public Instagram, X/Twitter, Pinterest, or TikTok link.", "error");
       return;
     }
     if (requestInProgress || (url === lastFetchedUrl && preview.classList.contains("show"))) return;
+    try { localStorage.setItem("uDownloaderLastLink", url); } catch { /* Storage may be disabled. */ }
 
     clearTimeout(autoFetchTimer);
     clearResult();
@@ -1195,18 +1204,18 @@
       }
       const clipboardText = await navigator.clipboard.readText();
       if (!clipboardText.trim()) {
-        setMessage("Your clipboard is empty. Copy an Instagram post link first.", "error");
+        setMessage("Your clipboard is empty. Copy a supported public post link first.", "info");
         return;
       }
       input.value = clipboardText.trim();
       if (safePlatformUrl(input.value)) {
         await processUrl(input.value);
       } else {
-        setMessage("That clipboard text doesn't look like a supported media link.", "error");
+        setMessage("That clipboard text doesn't look like a supported Instagram, X, Pinterest, or TikTok link.", "error");
       }
     } catch {
       input.focus();
-      setMessage("Clipboard permission was denied. Paste the link into the box; it will fetch automatically.", "error");
+      setMessage("Clipboard access is blocked by your browser. Tap the input, long-press it, and choose Paste.", "info");
     }
   });
 
@@ -1299,7 +1308,16 @@
 
   window.addEventListener("load", () => {
     handleSharedLink().then((handled) => {
-      if (!handled) setTimeout(tryAutoFetchClipboard, 250);
+      if (handled) return;
+      let savedUrl = "";
+      try { savedUrl = (localStorage.getItem("uDownloaderLastLink") || "").trim(); } catch { /* Storage may be disabled. */ }
+      if (savedUrl && safePlatformUrl(savedUrl)) {
+        input.value = savedUrl;
+        setMessage("Restored your last link. Fetching it again…", "info");
+        processUrl(savedUrl);
+        return;
+      }
+      setTimeout(tryAutoFetchClipboard, 250);
     }).catch(() => setTimeout(tryAutoFetchClipboard, 250));
   });
 </script>

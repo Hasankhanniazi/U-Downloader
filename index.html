@@ -1052,6 +1052,9 @@
       if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
         return url.pathname !== "/" && url.pathname.length > 1;
       }
+      if (host === "x.com" || host === "twitter.com") {
+        return /^\\/[A-Za-z0-9_]{1,15}\\/status\\/[0-9]+\\/?$/.test(url.pathname);
+      }
       return false;
     } catch {
       return false;
@@ -1133,7 +1136,7 @@
   async function processUrl(rawUrl) {
     const url = rawUrl.trim();
     if (!safePlatformUrl(url)) {
-      setMessage("Please enter a valid public Instagram post/Reel or TikTok video link.", "error");
+      setMessage("Please enter a valid public Instagram, TikTok, or X post link.", "error");
       return;
     }
     if (requestInProgress || (url === lastFetchedUrl && preview.classList.contains("show"))) return;
@@ -1221,6 +1224,41 @@
   });
 
   qualityDownload.addEventListener("click", downloadSelected);
+
+  // Best-effort convenience: read the clipboard automatically only when the
+  // browser has already granted clipboard-read permission. Browsers may block
+  // clipboard access on page load for privacy, so the manual paste button stays.
+  async function tryAutoFetchClipboard() {
+    if (!navigator.clipboard || typeof navigator.clipboard.readText !== "function") return;
+
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        let permission;
+        try {
+          permission = await navigator.permissions.query({ name: "clipboard-read" });
+        } catch {
+          // Some browsers do not support querying clipboard-read.
+        }
+        if (permission && permission.state !== "granted") return;
+      } else {
+        // Without a permission state, avoid prompting unexpectedly on page load.
+        return;
+      }
+
+      const copiedText = (await navigator.clipboard.readText()).trim();
+      if (!copiedText || !safePlatformUrl(copiedText)) return;
+
+      input.value = copiedText;
+      setMessage("Found a supported link in your clipboard. Fetching it now…", "success");
+      await processUrl(copiedText);
+    } catch {
+      // Silent fallback: clipboard access is controlled by the browser/OS.
+    }
+  }
+
+  window.addEventListener("load", () => {
+    setTimeout(tryAutoFetchClipboard, 250);
+  });
 </script>
 </body>
 </html>

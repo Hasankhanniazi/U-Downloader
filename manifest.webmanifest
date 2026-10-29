@@ -1,8 +1,8 @@
 {
   "id": "/U-Downloader/",
-  "name": "LOOX Media Grab",
-  "short_name": "LOOX",
-  "description": "Save supported public social media links with LOOX Media Grab.",
+  "name": "U-Downloader",
+  "short_name": "U-Downloader",
+  "description": "Save supported public social media links with U-Downloader.",
   "start_url": "/U-Downloader/",
   "scope": "/U-Downloader/",
   "display": "standalone",

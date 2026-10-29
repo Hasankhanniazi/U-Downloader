@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="description" content="LOOX Media Grab makes it easy to access public Instagram and TikTok media. Simple, fast and mobile friendly.">
+  <title>LOOX Media Grab – Instagram & TikTok Downloader</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #151c2e;
+      --border: #273149;
+      --text: #f8fafc;
+      --muted: #9ca8bd;
+      --purple: #9333ea;
+      --pink: #ec4899;
+      --orange: #f97316;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin-inline: auto;
+    }
+
+    .gradient-text {
+      background: linear-gradient(100deg, #c084fc, #f472b6, #fb923c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* Header */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(11, 15, 25, .88);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .navbar {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .logo-mark {
+      display: grid;
+      place-items: center;
+      width: 39px;
+      height: 39px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #9333ea, #ec4899, #f97316);
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 5px 24px #9333ea33;
+    }
+
+    .logo small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      line-height: 1.2;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 27px;
+      color: #bdc5d5;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .nav-cta {
+      padding: 10px 17px;
+      border-radius: 10px;
+      color: white !important;
+      background: linear-gradient(110deg, #9333ea, #ec4899);
+    }
+
+    /* Hero */
+
+    .hero {
+      position: relative;
+      padding: 86px 0 70px;
+      text-align: center;
+      isolation: isolate;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 380px;
+      left: 50%;
+      top: -100px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse, #9333ea20, #ec489908 48%, transparent 72%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid #9333ea55;
+      border-radius: 100px;
+      padding: 7px 14px;
+      color: #e0b8ff;
+      background: #9333ea12;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #4ade80;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #4ade8088;
+    }
+
+    h1 {
+      max-width: 850px;
+      margin: 0 auto;
+      font-size: clamp(36px, 6vw, 66px);
+      line-height: 1.12;
+      letter-spacing: -3px;
+      font-weight: 800;
+    }
+
+    .hero-description {
+      max-width: 620px;
+      margin: 22px auto 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    /* Downloader */
+
+    .downloader {
+      width: min(720px, 100%);
+      margin: 40px auto 0;
+      padding: 26px;
+      border: 1px solid #34334f;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #191d32, #121827);
+      box-shadow: 0 24px 80px #00000035;
+      text-align: left;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px;
+      border: 1px solid #364057;
+      background: #0b1020;
+      border-radius: 13px;
+      transition: border-color .2s;
+    }
+
+    .input-row:focus-within {
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px #9333ea18;
+    }
+
+    .input-icon {
+      padding-left: 8px;
+      color: #a78bfa;
+      font-size: 19px;
+    }
+
+    .input-row input {
+      min-width: 0;
+      flex: 1;
+      padding: 12px 2px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 14px;
+    }
+
+    .input-row input::placeholder {
+      color: #748098;
+    }
+
+    .paste-btn {
+      border: 1px solid #343d55;
+      background: #1c2438;
+      color: #dbe3f2;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .paste-btn:hover {
+      background: #29334d;
+    }
+
+    .download-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 15px 18px;
+      border: 0;
+      border-radius: 11px;
+      background: linear-gradient(105deg, #9333ea, #d946a5 55%, #f97316);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .2s, filter .2s;
+    }
+
+    .download-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .download-btn:disabled {
+      opacity: .65;
+      cursor: wait;
+      transform: none;
+    }
+
+    .privacy-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-top: 15px;
+      color: #8995aa;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      color: #fecaca;
+      background: #7f1d1d33;
+      border: 1px solid #ef444444;
+    }
+
+    .message.success {
+      color: #bbf7d0;
+      background: #14532d33;
+      border: 1px solid #22c55e44;
+    }
+
+    .result-link {
+      display: none;
+      margin-top: 12px;
+      padding: 13px;
+      background: #0b1020;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .result-link.show {
+      display: block;
+    }
+
+    .result-link a {
+      display: inline-block;
+      margin-top: 8px;
+      color: #d8b4fe;
+      text-decoration: underline;
+    }
+
+    .platforms {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .platform {
+      padding: 7px 13px;
+      border: 1px solid #293147;
+      border-radius: 9px;
+      background: #121827aa;
+      color: #b6c0d2;
+      font-size: 11px;
+    }
+
+    /* Sections */
+
+    section.content-section {
+      padding: 76px 0;
+    }
+
+    .section-heading {
+      max-width: 650px;
+      margin: 0 auto 42px;
+      text-align: center;
+    }
+
+    .section-kicker {
+      color: #c084fc;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-top: 12px;
+      font-size: clamp(27px, 4vw, 39px);
+      letter-spacing: -1.5px;
+      line-height: 1.2;
+    }
+
+    .section-heading p {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card {
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(145deg, #171e30, #111725);
+      transition: border-color .2s, transform .2s;
+    }
+
+    .feature-card:hover {
+      border-color: #8043bd88;
+      transform: translateY(-3px);
+    }
+
+    .feature-icon {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      margin-bottom: 19px;
+      border: 1px solid #9333ea33;
+      border-radius: 13px;
+      background: #9333ea18;
+      font-size: 22px;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      margin-bottom: 9px;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    /* Steps */
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 25px 18px;
+    }
+
+    .step-number {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 18px;
+      border: 1px solid #9333ea66;
+      border-radius: 15px;
+      background: #9333ea1b;
+      color: #d8b4fe;
+      font-weight: 800;
+    }
+
+    .step h3 {
+      font-size: 16px;
+      margin-bottom: 9px;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* FAQ */
+
+    .faq-list {
+      max-width: 760px;
+      margin: auto;
+    }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: #121827;
+    }
+
+    summary {
+      padding: 18px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      color: #c084fc;
+      font-size: 20px;
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    details p {
+      padding: 0 20px 19px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    /* Footer */
+
+    footer {
+      border-top: 1px solid #252c3c;
+      padding: 34px 0;
+      background: #090c14;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-copy {
+      color: #8490a5;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      color: #aab4c6;
+      font-size: 12px;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    @media (max-width: 760px) {
+      .container {
+        width: min(100% - 30px, 600px);
+      }
+
+      .navbar {
+        min-height: 68px;
+      }
+
+      .nav-links {
+        gap: 15px;
+        font-size: 12px;
+      }
+
+      .nav-links a:nth-child(2),
+      .nav-links a:nth-child(3) {
+        display: none;
+      }
+
+      .nav-cta {
+        padding: 8px 11px;
+      }
+
+      .hero {
+        padding: 65px 0 48px;
+      }
+
+      h1 {
+        letter-spacing: -1.7px;
+      }
+
+      .hero-description {
+        font-size: 14px;
+      }
+
+      .downloader {
+        padding: 18px;
+        margin-top: 30px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 13px;
+      }
+
+      .feature-card {
+        padding: 22px;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .step {
+        padding: 20px 10px;
+      }
+
+      section.content-section {
+        padding: 58px 0;
+      }
+
+      .section-heading {
+        margin-bottom: 28px;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .logo {
+        font-size: 19px;
+        gap: 8px;
+      }
+
+      .logo-mark {
+        width: 35px;
+        height: 35px;
+      }
+
+      .nav-links {
+        gap: 9px;
+      }
+
+      .nav-cta {
+        font-size: 11px;
+      }
+
+      .input-row {
+        gap: 5px;
+      }
+
+      .input-row input {
+        font-size: 12px;
+      }
+
+      .paste-btn {
+        padding: 9px 8px;
+      }
+
+      .platforms {
+        gap: 7px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container navbar">
+    <a href="#" class="logo" aria-label="LOOX Media Grab home">
+      <span class="logo-mark">L</span>
+      <span>LOOX<small>MEDIA GRAB</small></span>
+    </a>
+
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#downloader">Downloader</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+      <a href="#downloader" class="nav-cta">Get Started ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="downloader">
+    <div class="container">
+      <div class="eyebrow">
+        <span class="status-dot"></span>
+        Simple media downloading
+      </div>
+
+      <h1>
+        Your social media,<br>
+        <span class="gradient-text">saved your way.</span>
+      </h1>
+
+      <p class="hero-description">
+        Download public Instagram videos, Reels and photos with a
+        simple, easy-to-use interface. Paste a link to get started.
+      </p>
+
+      <div class="downloader">
+        <label class="input-label" for="mediaUrl">
+          Paste your media link
+        </label>
+
+        <form id="downloadForm">
+          <div class="input-row">
+            <span class="input-icon" aria-hidden="true">↗</span>
+            <input
+              id="mediaUrl"
+              type="url"
+              placeholder="https://www.instagram.com/reel/..."
+              autocomplete="url"
+              required
+            >
+            <button type="button" class="paste-btn" id="pasteBtn">
+              Paste
+            </button>
+          </div>
+
+          <button type="submit" class="download-btn" id="downloadBtn">
+            Get Media →
+          </button>
+        </form>
+
+        <div class="message" id="message" role="status" aria-live="polite"></div>
+        <div class="result-link" id="resultLink"></div>
+
+        <p class="privacy-note">
+          <span aria-hidden="true">🔒</span>
+          Use public links and respect the original creator's rights.
+        </p>
+      </div>
+
+      <div class="platforms" aria-label="Supported media">
+        <span class="platform">◎ Instagram</span>
+        <span class="platform">♪ TikTok</span>
+        <span class="platform">✦ Easy to use</span>
+        <span class="platform">↗ Mobile friendly</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="features">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-kicker">Why LOOX?</span>
+        <h2>A simpler way to save <span class="gradient-text">media</span></h2>
+        <p>
+          A clean interface built to make the process straightforward
+          across phones, tablets and desktop computers.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Simple process</h3>
+          <p>
+            Paste a supported link and let the connected service
+            process your request.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>Works on mobile</h3>
+          <p>
+            A responsive layout designed to fit smaller screens
+            as well as desktop displays.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Respect creators</h3>
+          <p>
+            Use media responsibly, follow platform rules and get
+            permission when required.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="how-it-works">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-kicker">Three easy steps</span>
+        <h2>How it works</h2>
+        <p>Getting started is straightforward.</p>
+      </div>
+
+      <div class="steps">
+        <article class="step">
+          <div class="step-number">01</div>
+          <h3>Copy a link</h3>
+          <p>Copy the link to the public post you want to access.</p>
+        </article>
+
+        <article class="step">
+          <div class="step-number">02</div>
+          <h3>Paste it here</h3>
+          <p>Place the link in the input field and select Get Media.</p>
+        </article>
+
+        <article class="step">
+          <div class="step-number">03</div>
+          <h3>Open your result</h3>
+          <p>If the service supports the link, open the returned media.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="faq">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-kicker">Got questions?</span>
+        <h2>Frequently asked questions</h2>
+        <p>Some quick information about using LOOX Media Grab.</p>
+      </div>
+
+      <div class="faq-list">
+        <details>
+          <summary>How do I use LOOX Media Grab?</summary>
+          <p>
+            Copy a supported public media link, paste it into the
+            downloader and select Get Media. Available results depend
+            on the connected backend and the source platform.
+          </p>
+        </details>
+
+        <details>
+          <summary>Can I use it on my phone?</summary>
+          <p>
+            Yes. The interface adapts to mobile phones, tablets
+            and desktop screens. Actual downloading also depends on
+            your browser and the returned media format.
+          </p>
+        </details>
+
+        <details>
+          <summary>Why is my link not working?</summary>
+          <p>
+            Check that the URL is correct and publicly accessible.
+            Some links may be unsupported, unavailable or restricted
+            by the original platform.
+          </p>
+        </details>
+
+        <details>
+          <summary>Is every post downloadable?</summary>
+          <p>
+            No. Availability depends on platform restrictions and
+            backend support. Private or restricted content may not
+            be accessible.
+          </p>
+        </details>
+
+        <details>
+          <summary>Can I use downloaded media anywhere?</summary>
+          <p>
+            Not necessarily. Respect copyright, creator permissions
+            and the terms of the original platform. Only use media
+            in ways you are authorized to use it.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div>
+      <a href="#" class="logo">
+        <span class="logo-mark">L</span>
+        <span>LOOX<small>MEDIA GRAB</small></span>
+      </a>
+      <p class="footer-copy">
+        © <span id="year"></span> LOOX Media Grab. All rights reserved.
+      </p>
+    </div>
+
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="#downloader">Home</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+      <a href="mailto:contact@looxmediagrab.com">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  const API_URL =
+    "http

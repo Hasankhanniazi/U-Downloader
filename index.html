@@ -1053,7 +1053,10 @@
         return url.pathname !== "/" && url.pathname.length > 1;
       }
       if (host === "x.com" || host === "twitter.com") {
-        return /^\\/[A-Za-z0-9_]{1,15}\\/status\\/[0-9]+\\/?$/.test(url.pathname);
+        const parts = url.pathname.split("/");
+        return parts.length === 4 && parts[0] === "" &&
+          /^[A-Za-z0-9_]{1,15}$/.test(parts[1]) &&
+          parts[2] === "status" && /^[0-9]+$/.test(parts[3]);
       }
       return false;
     } catch {

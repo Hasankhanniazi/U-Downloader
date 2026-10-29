@@ -1266,7 +1266,7 @@
 
     const candidates = [params.get("url"), params.get("text"), params.get("title")].filter(Boolean);
     for (const candidate of candidates) {
-      const matches = candidate.match(/https?:\\/\\/[^\\s<>"']+/gi) || [candidate.trim()];
+      const matches = candidate.match(/https?:\/\/[^\s<>"']+/gi) || [candidate.trim()];
       for (const match of matches) {
         const cleaned = match.replace(/[),.;!?]+$/, "");
         if (safePlatformUrl(cleaned)) return cleaned;

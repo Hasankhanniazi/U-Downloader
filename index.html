@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b0f19">
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="description" content="LOOX Media Grab makes it easy to access public Instagram and TikTok media. Simple, fast and mobile friendly.">
   <title>LOOX Media Grab – Instagram & TikTok Downloader</title>
 
@@ -794,8 +795,8 @@
       </h1>
 
       <p class="hero-description">
-        Download public Instagram videos, Reels and photos with a
-        simple, easy-to-use interface. Paste a link to get started.
+        Download public Instagram videos, Reels, TikTok and X media with a
+        simple interface. Paste a link or share it directly to LOOX from Android.
       </p>
 
       <div class="downloader">
@@ -913,8 +914,8 @@
 
         <article class="step">
           <div class="step-number">02</div>
-          <h3>Paste it here</h3>
-          <p>Place the link in the input field and select Get Media.</p>
+          <h3>Paste or share it</h3>
+          <p>Paste the link here, or use Android’s Share menu and choose LOOX after installing it.</p>
         </article>
 
         <article class="step">
@@ -938,9 +939,7 @@
         <details>
           <summary>How do I use LOOX Media Grab?</summary>
           <p>
-            Copy a supported public media link, paste it into the
-            downloader and select Get Media. Available results depend
-            on the connected backend and the source platform.
+            Copy a supported public media link and paste it into the downloader. On Android, you can also install LOOX from your browser menu, then use a post’s Share menu and choose LOOX. Available results depend on backend and platform support.
           </p>
         </details>
 
@@ -1007,6 +1006,7 @@
 
 <script>
   // The API key stays on the backend; never place it in frontend code.
+  // Web Share Target: Android can send a shared post URL to this installed PWA.
   const API_URL = "https://backend-iota-hazel-43yo2mhlfs.vercel.app/api/download";
 
   const form = document.getElementById("downloadForm");
@@ -1259,8 +1259,42 @@
     }
   }
 
+  // Read links sent by Android's Share menu through the installed PWA manifest.
+  function getSharedMediaUrl() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("share-target")) return "";
+
+    const candidates = [params.get("url"), params.get("text"), params.get("title")].filter(Boolean);
+    for (const candidate of candidates) {
+      const matches = candidate.match(/https?:\\/\\/[^\\s<>"']+/gi) || [candidate.trim()];
+      for (const match of matches) {
+        const cleaned = match.replace(/[),.;!?]+$/, "");
+        if (safePlatformUrl(cleaned)) return cleaned;
+      }
+    }
+    return "";
+  }
+
+  async function handleSharedLink() {
+    const sharedUrl = getSharedMediaUrl();
+    if (!sharedUrl) return false;
+
+    input.value = sharedUrl;
+    // Remove shared post details from the address bar after capturing the link.
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    setMessage("Link received from Android Share. Fetching media…", "success");
+    await processUrl(sharedUrl);
+    return true;
+  }
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+
   window.addEventListener("load", () => {
-    setTimeout(tryAutoFetchClipboard, 250);
+    handleSharedLink().then((handled) => {\n      if (!handled) setTimeout(tryAutoFetchClipboard, 250);\n    }).catch(() => setTimeout(tryAutoFetchClipboard, 250));
   });
 </script>
 </body>

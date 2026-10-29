@@ -1,4 +1,4 @@
-const CACHE_NAME = "loox-shell-v1";
+const CACHE_NAME = "loox-shell-v2";
 const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -21,8 +21,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(request).then((response) => {
       if (response.ok && new URL(request.url).pathname.startsWith("/U-Downloader/")) {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        if (!new URL(request.url).searchParams.has("share-target")) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
       }
       return response;
     }).catch(() => caches.match(request).then((cached) => cached || caches.match("./")))

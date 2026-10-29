@@ -1294,7 +1294,9 @@
   }
 
   window.addEventListener("load", () => {
-    handleSharedLink().then((handled) => {\n      if (!handled) setTimeout(tryAutoFetchClipboard, 250);\n    }).catch(() => setTimeout(tryAutoFetchClipboard, 250));
+    handleSharedLink().then((handled) => {
+      if (!handled) setTimeout(tryAutoFetchClipboard, 250);
+    }).catch(() => setTimeout(tryAutoFetchClipboard, 250));
   });
 </script>
 </body>

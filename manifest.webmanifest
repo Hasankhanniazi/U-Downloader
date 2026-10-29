@@ -1,0 +1,35 @@
+{
+  "id": "/U-Downloader/",
+  "name": "LOOX Media Grab",
+  "short_name": "LOOX",
+  "description": "Save supported public social media links with LOOX Media Grab.",
+  "start_url": "/U-Downloader/",
+  "scope": "/U-Downloader/",
+  "display": "standalone",
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "share_target": {
+    "action": "/U-Downloader/?share-target=1",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

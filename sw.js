@@ -1,4 +1,4 @@
-const CACHE_NAME = "loox-shell-v2";
+const CACHE_NAME = "u-downloader-shell-v3";
 const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (event) => {

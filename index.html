@@ -352,6 +352,89 @@
       text-decoration: underline;
     }
 
+    .media-preview {
+      display: none;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid #34334f;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #111827, #0b1020);
+    }
+
+    .media-preview.show { display: block; }
+
+    .preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .ready-status { color: #6ee7b7; font-weight: 600; }
+
+    .cover-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #080d18;
+      border: 1px solid #293147;
+    }
+
+    .cover-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .cover-placeholder {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .media-title { margin-top: 14px; font-size: 18px; font-weight: 800; }
+
+    .quality-label {
+      display: block;
+      margin: 14px 0 7px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .quality-select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #364057;
+      border-radius: 11px;
+      background: #0d1525;
+      color: white;
+      font: inherit;
+      outline: none;
+    }
+
+    .quality-download {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      border: 0;
+      border-radius: 11px;
+      background: linear-gradient(105deg, #9333ea, #d946a5 55%, #f97316);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .quality-download:disabled { opacity: .6; cursor: wait; }
+
     .platforms {
       display: flex;
       justify-content: center;
@@ -741,6 +824,19 @@
         </form>
 
         <div class="message" id="message" role="status" aria-live="polite"></div>
+        <section class="media-preview" id="mediaPreview" aria-live="polite">
+          <div class="preview-top">
+            <span id="previewPlatform">Instagram media</span>
+            <span class="ready-status">✓ Media ready</span>
+          </div>
+          <div class="cover-wrap" id="coverWrap">
+            <div class="cover-placeholder">Cover preview unavailable</div>
+          </div>
+          <div class="media-title" id="mediaTitle">Your media is ready</div>
+          <label class="quality-label" for="qualitySelect">Download quality / format</label>
+          <select class="quality-select" id="qualitySelect"></select>
+          <button type="button" class="quality-download" id="qualityDownload">↓ Download media</button>
+        </section>
         <div class="result-link" id="resultLink"></div>
 
         <p class="privacy-note">
@@ -910,7 +1006,7 @@
 </footer>
 
 <script>
-  // Keep the InterAPI key on the backend only. Never place it in this file.
+  // The API key stays on the backend; never place it in frontend code.
   const API_URL = "https://backend-iota-hazel-43yo2mhlfs.vercel.app/api/download";
 
   const form = document.getElementById("downloadForm");
@@ -919,7 +1015,18 @@
   const pasteButton = document.getElementById("pasteBtn");
   const message = document.getElementById("message");
   const result = document.getElementById("resultLink");
+  const preview = document.getElementById("mediaPreview");
+  const coverWrap = document.getElementById("coverWrap");
+  const mediaTitle = document.getElementById("mediaTitle");
+  const previewPlatform = document.getElementById("previewPlatform");
+  const qualitySelect = document.getElementById("qualitySelect");
+  const qualityDownload = document.getElementById("qualityDownload");
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  let currentMedia = [];
+  let autoFetchTimer = null;
+  let lastFetchedUrl = "";
+  let requestInProgress = false;
 
   function setMessage(text, kind) {
     message.textContent = text;
@@ -929,6 +1036,9 @@
   function clearResult() {
     result.replaceChildren();
     result.classList.remove("show");
+    preview.classList.remove("show");
+    currentMedia = [];
+    lastFetchedUrl = "";
   }
 
   function safePlatformUrl(value) {
@@ -948,55 +1058,92 @@
     }
   }
 
-  function addMediaLink(item, index) {
-    const card = document.createElement("div");
-    card.style.marginTop = index ? "12px" : "0";
-    card.style.paddingTop = index ? "12px" : "0";
-    if (index) card.style.borderTop = "1px solid var(--border)";
-
-    const label = document.createElement("div");
+  function labelFor(item, index) {
     const kind = (item.type || "media").toString();
-    label.textContent = kind.charAt(0).toUpperCase() + kind.slice(1) +
-      (item.quality ? " · " + item.quality : "");
-    label.style.fontWeight = "600";
-    card.appendChild(label);
+    const quality = (item.quality || "").toString().trim();
+    const label = quality || (kind.toLowerCase() === "photo" || kind.toLowerCase() === "image" ? "Image" : "Original quality");
+    return label + (currentMedia.filter(x => (x.quality || x.type) === (item.quality || item.type)).length > 1 ? " " + (index + 1) : "");
+  }
 
+  function renderPreview(data) {
+    currentMedia = data.media || [];
+    const thumb = typeof data.thumbnail === "string" ? data.thumbnail : "";
+    coverWrap.replaceChildren();
+
+    if (thumb && /^https?:\/\//i.test(thumb)) {
+      const img = document.createElement("img");
+      img.src = thumb;
+      img.alt = "Preview of the selected public post";
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => {
+        coverWrap.replaceChildren();
+        const fallback = document.createElement("div");
+        fallback.className = "cover-placeholder";
+        fallback.textContent = "Cover preview unavailable";
+        coverWrap.appendChild(fallback);
+      };
+      coverWrap.appendChild(img);
+    } else {
+      const fallback = document.createElement("div");
+      fallback.className = "cover-placeholder";
+      fallback.textContent = "Cover preview unavailable";
+      coverWrap.appendChild(fallback);
+    }
+
+    const title = (data.title || "").trim();
+    mediaTitle.textContent = title || "Your media is ready";
+    previewPlatform.textContent = (data.platform || "media").toString().toUpperCase() + " · " + currentMedia.length + (currentMedia.length === 1 ? " option" : " options");
+    qualitySelect.replaceChildren();
+
+    currentMedia.forEach((item, index) => {
+      const option = document.createElement("option");
+      option.value = String(index);
+      option.textContent = labelFor(item, index);
+      qualitySelect.appendChild(option);
+    });
+
+    qualitySelect.onchange = updateDownloadButton;
+    updateDownloadButton();
+    preview.classList.add("show");
+  }
+
+  function updateDownloadButton() {
+    const item = currentMedia[Number(qualitySelect.value)] || currentMedia[0];
+    const kind = (item?.type || "media").toString().toLowerCase();
+    qualityDownload.textContent = "↓ Download " + (kind === "photo" || kind === "image" ? "Image" : kind === "video" ? "Video" : "Media");
+    qualityDownload.disabled = !item || !(item.downloadUrl || item.url);
+  }
+
+  function downloadSelected() {
+    const item = currentMedia[Number(qualitySelect.value)] || currentMedia[0];
+    const url = item && (item.downloadUrl || item.url);
+    if (!url) return;
     const link = document.createElement("a");
-    link.href = item.downloadUrl || item.url;
-    link.textContent = "Open / download " + (kind === "photo" ? "image" : kind === "video" ? "video" : "media");
+    link.href = url;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     link.referrerPolicy = "no-referrer";
-    card.appendChild(link);
-    result.appendChild(card);
+    link.download = "";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   }
 
-  pasteButton.addEventListener("click", async () => {
-    try {
-      if (!navigator.clipboard || !navigator.clipboard.readText) {
-        setMessage("Clipboard access is unavailable in this browser. Paste the link into the box manually.", "error");
-        return;
-      }
-      input.value = await navigator.clipboard.readText();
-      input.focus();
-      setMessage("Link pasted. Select Get Media to continue.", "success");
-    } catch {
-      setMessage("Clipboard permission was denied. Paste the link into the box manually.", "error");
-    }
-  });
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    clearResult();
-
-    const url = input.value.trim();
+  async function processUrl(rawUrl) {
+    const url = rawUrl.trim();
     if (!safePlatformUrl(url)) {
       setMessage("Please enter a valid public Instagram post/Reel or TikTok video link.", "error");
       return;
     }
+    if (requestInProgress || (url === lastFetchedUrl && preview.classList.contains("show"))) return;
 
+    clearTimeout(autoFetchTimer);
+    clearResult();
+    requestInProgress = true;
     button.disabled = true;
-    button.textContent = "Processing…";
+    pasteButton.disabled = true;
+    button.textContent = "Fetching media…";
     message.className = "message";
     try {
       const response = await fetch(API_URL, {
@@ -1004,33 +1151,76 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url })
       });
-
       let data;
       try {
         data = await response.json();
       } catch {
-        throw new Error("The backend returned an unexpected response. Please try again later.");
+        throw new Error("The backend returned an unexpected response. Please try again.");
       }
-
       if (!response.ok || !data.success) {
         throw new Error(data.error || "Could not process this link. Please try again.");
       }
-
-      const media = Array.isArray(data.media) ? data.media : [];
-      if (!media.length) {
+      if (!Array.isArray(data.media) || !data.media.length) {
         throw new Error("No downloadable media was found for this link.");
       }
-
-      media.forEach(addMediaLink);
-      result.classList.add("show");
-      setMessage("Media found. Choose a link below to open or download it.", "success");
+      lastFetchedUrl = url;
+      renderPreview(data);
+      setMessage("Media found. Choose a quality or format below.", "success");
     } catch (error) {
       setMessage(error.message || "Something went wrong. Please try again.", "error");
     } finally {
+      requestInProgress = false;
       button.disabled = false;
+      pasteButton.disabled = false;
       button.textContent = "Get Media →";
     }
+  }
+
+  pasteButton.addEventListener("click", async () => {
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.readText) {
+        input.focus();
+        setMessage("Clipboard access is unavailable here. Paste the link into the box; it will fetch automatically.", "error");
+        return;
+      }
+      const clipboardText = await navigator.clipboard.readText();
+      if (!clipboardText.trim()) {
+        setMessage("Your clipboard is empty. Copy an Instagram post link first.", "error");
+        return;
+      }
+      input.value = clipboardText.trim();
+      if (safePlatformUrl(input.value)) {
+        await processUrl(input.value);
+      } else {
+        setMessage("That clipboard text doesn't look like a supported media link.", "error");
+      }
+    } catch {
+      input.focus();
+      setMessage("Clipboard permission was denied. Paste the link into the box; it will fetch automatically.", "error");
+    }
   });
+
+  // When a user pastes or enters a complete link, start fetching automatically.
+  input.addEventListener("paste", () => {
+    setTimeout(() => {
+      const url = input.value.trim();
+      if (safePlatformUrl(url)) processUrl(url);
+    }, 50);
+  });
+
+  input.addEventListener("input", () => {
+    clearTimeout(autoFetchTimer);
+    const url = input.value.trim();
+    if (!safePlatformUrl(url)) return;
+    autoFetchTimer = setTimeout(() => processUrl(url), 650);
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await processUrl(input.value);
+  });
+
+  qualityDownload.addEventListener("click", downloadSelected);
 </script>
 </body>
 </html>

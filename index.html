@@ -31,16 +31,21 @@
     }
 
     html {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
       scroll-behavior: smooth;
       scroll-padding-top: 90px;
     }
 
     body {
+      width: 100%;
+      max-width: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
       line-height: 1.6;
-      overflow-x: hidden;
+      overflow-x: clip;
     }
 
     a {
@@ -147,7 +152,7 @@
 
     .hero {
       position: relative;
-      padding: 86px 0 70px;
+      padding: 68px 0 52px;
       text-align: center;
       isolation: isolate;
     }
@@ -155,7 +160,8 @@
     .hero::before {
       content: "";
       position: absolute;
-      width: 520px;
+      width: min(520px, 100vw);
+      max-width: 100%;
       height: 380px;
       left: 50%;
       top: -100px;
@@ -504,12 +510,12 @@
     /* Sections */
 
     section.content-section {
-      padding: 76px 0;
+      padding: 52px 0;
     }
 
     .section-heading {
       max-width: 650px;
-      margin: 0 auto 42px;
+      margin: 0 auto 30px;
       text-align: center;
     }
 
@@ -735,7 +741,7 @@
 
     .footer-developers {
       color: #cbd5e1;
-      font-weight: 700;
+      font-weight: 400;
     }
 
     @media (max-width: 760px) {
@@ -761,7 +767,7 @@
       }
 
       .hero {
-        padding: 65px 0 48px;
+        padding: 52px 0 38px;
       }
 
       h1 {
@@ -796,11 +802,11 @@
       }
 
       section.content-section {
-        padding: 58px 0;
+        padding: 40px 0;
       }
 
       .section-heading {
-        margin-bottom: 28px;
+        margin-bottom: 22px;
       }
 
       .privacy-points {
@@ -1134,7 +1140,7 @@
       U-downloader is an independent utility tool and is not affiliated with Instagram, X, TikTok, or Pinterest. Respect copyright laws and platform terms.
     </p>
 
-    <p class="footer-developers"><strong>Developed by Hasan Niazi &amp; Saud Khan.</strong></p>
+    <p class="footer-developers">Developed by Hasan Niazi &amp; Saud Khan.</p>
 
     <p class="footer-copy">© 2026 U-Downloader. All rights reserved.</p>
   </div>

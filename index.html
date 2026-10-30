@@ -955,6 +955,16 @@
     .footer-links { color: #475569; }
     .footer-disclaimer, .footer-developers, .footer-copy { color: #64748b; }
 
+    /* Match feature points to the Privacy and Copyright list styling */
+    #features .feature-description { max-width: 900px; margin: 0 auto; }
+    #features .feature-description p {
+      margin: 0 0 8px;
+      color: #111827;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+    #features .feature-description strong { font-weight: 700; }
+
     /* Privacy and copyright text as one clean paragraph */
     #privacy-copyright .privacy-points { display: block; max-width: 900px; border: 0; }
     #privacy-copyright .privacy-point { display: none; }
@@ -1172,30 +1182,10 @@
         </p>
       </div>
 
-      <div class="feature-grid">
-        <article class="feature-card">
-          <h3>Simple process</h3>
-          <p>
-            Paste a supported link and let the connected service
-            process your request.
-          </p>
-        </article>
-
-        <article class="feature-card">
-          <h3>Works on mobile</h3>
-          <p>
-            A responsive layout designed to fit smaller screens
-            as well as desktop displays.
-          </p>
-        </article>
-
-        <article class="feature-card">
-          <h3>Respect creators</h3>
-          <p>
-            Use media responsibly, follow platform rules and get
-            permission when required.
-          </p>
-        </article>
+      <div class="feature-description">
+        <p>• <strong>Simple Process:</strong> Paste a supported link and let the connected service process your request.</p>
+        <p>• <strong>Works on Mobile:</strong> A responsive layout designed to fit smaller screens as well as desktop displays.</p>
+        <p>• <strong>Respect Creators:</strong> Use media responsibly, follow platform rules and get permission when required.</p>
       </div>
     </div>
   </section>

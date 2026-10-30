@@ -211,6 +211,42 @@
       text-align: left;
     }
 
+    .platform-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 18px;
+      padding: 5px;
+      border: 1px solid #303951;
+      border-radius: 12px;
+      background: #0b1020;
+    }
+
+    .platform-tab {
+      min-width: 0;
+      padding: 10px 6px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #aeb9cd;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+
+    .platform-tab:hover {
+      color: #fff;
+      background: #202941;
+    }
+
+    .platform-tab.active {
+      color: #fff;
+      border-color: #9b55dc88;
+      background: linear-gradient(120deg, #9333ea44, #ec489933);
+      box-shadow: 0 3px 14px #9333ea18;
+    }
+
     .input-label {
       display: block;
       font-size: 13px;
@@ -741,6 +777,15 @@
         font-size: 11px;
       }
 
+      .platform-tabs {
+        gap: 4px;
+      }
+
+      .platform-tab {
+        padding: 9px 3px;
+        font-size: 10px;
+      }
+
       .input-row {
         gap: 5px;
       }
@@ -793,16 +838,21 @@
       </div>
 
       <h1>
-        Your social media,<br>
-        <span class="gradient-text">saved your way.</span>
+        Download Instagram Reels, TikTok Videos &amp; More
       </h1>
 
       <p class="hero-description">
-        Download public Instagram, X/Twitter, Pinterest and TikTok media with a
-        simple interface. Paste a link or share it directly to U-Downloader from Android.
+        U-Downloader is a free online tool for downloading media from supported public Instagram Reels, TikTok, Pinterest, and X links. Paste a link, choose a platform, and follow the download steps. Only download content you have permission to save.
       </p>
 
       <div class="downloader">
+        <div class="platform-tabs" role="tablist" aria-label="Choose a platform">
+          <button type="button" class="platform-tab active" role="tab" aria-selected="true" data-platform="instagram">◎ Instagram</button>
+          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="x">✦ X / Twitter</button>
+          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="pinterest">📌 Pinterest</button>
+          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="tiktok">♪ TikTok</button>
+        </div>
+
         <label class="input-label" for="mediaUrl">
           Paste your media link
         </label>
@@ -845,11 +895,11 @@
 
         <p class="privacy-note">
           <span aria-hidden="true">🔒</span>
-          Use public links and respect the original creator's rights.
+          Only public links are processed. Private accounts, personal credentials, and copyright bypass attempts are strictly blocked.
         </p>
         <p class="privacy-note" style="margin-top:8px">
           <span aria-hidden="true">📲</span>
-          Android tip: install U-Downloader from your browser menu, then use Share → U-Downloader on a supported post.
+          
         </p>
       </div>
 
@@ -1028,7 +1078,41 @@
   const previewPlatform = document.getElementById("previewPlatform");
   const qualitySelect = document.getElementById("qualitySelect");
   const qualityDownload = document.getElementById("qualityDownload");
+  const platformTabs = [...document.querySelectorAll(".platform-tab")];
+  let selectedPlatform = "instagram";
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  function detectPlatform(value) {
+    try {
+      const host = new URL(value).hostname.toLowerCase().replace(/^www\\./, "");
+      if (host === "instagram.com" || host === "instagr.am") return "instagram";
+      if (host === "x.com" || host === "twitter.com") return "x";
+      if (host === "pinterest.com" || host.endsWith(".pinterest.com") || host === "pin.it") return "pinterest";
+      if (host === "tiktok.com" || host.endsWith(".tiktok.com")) return "tiktok";
+    } catch {}
+    return "";
+  }
+
+  function selectPlatform(platform) {
+    if (!platformTabs.some(tab => tab.dataset.platform === platform)) return;
+    selectedPlatform = platform;
+    platformTabs.forEach(tab => {
+      const active = tab.dataset.platform === platform;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+    const examples = {
+      instagram: "https://www.instagram.com/reel/...",
+      x: "https://x.com/username/status/...",
+      pinterest: "https://www.pinterest.com/pin/...",
+      tiktok: "https://www.tiktok.com/@username/video/..."
+    };
+    input.placeholder = examples[platform];
+  }
+
+  platformTabs.forEach(tab => {
+    tab.addEventListener("click", () => selectPlatform(tab.dataset.platform));
+  });
 
   let currentMedia = [];
   let autoFetchTimer = null;
@@ -1149,6 +1233,8 @@
 
   async function processUrl(rawUrl) {
     const url = rawUrl.trim();
+    const detectedPlatform = detectPlatform(url);
+    if (detectedPlatform) selectPlatform(detectedPlatform);
     if (!safePlatformUrl(url)) {
       setMessage("Please enter a valid public Instagram, X/Twitter, Pinterest, or TikTok link.", "error");
       return;

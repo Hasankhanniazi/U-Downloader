@@ -1023,7 +1023,13 @@
     #features .feature-card h3 {
       display: inline; margin: 0; font-weight: 800; color: #111827;
     }
+/* Match feature and process subheadings to the privacy list style */
     #features .feature-card h3::before { content: "• "; }
+    #how-it-works .step h3 {
+      display: inline; margin: 0; font-weight: 800; color: #111827;
+    }
+    #how-it-works .step h3::before { content: counter(process) ". "; }
+    #how-it-works .step { counter-increment: process; }
     #features .feature-card p { display: inline; }
     #how-it-works .step { border: 0; padding: 12px 0 18px; }
     #how-it-works .step-number { margin-bottom: 8px; }

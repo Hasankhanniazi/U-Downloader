@@ -869,6 +869,102 @@
         transition: none !important;
       }
     }
+
+    /* Light theme */
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #64748b;
+      --purple: #16a34a;
+      --pink: #22c55e;
+      --orange: #4ade80;
+    }
+    body { background: #fff; color: #111827; }
+    header { background: rgba(255,255,255,.94); border-bottom: 1px solid #e5e7eb; }
+    .nav-links { color: #475569; }
+    .nav-links a:hover, .footer-links a:hover { color: #15803d; }
+    .hero::before { opacity: .45; }
+    .eyebrow { color: #15803d; background: #f0fdf4; border-color: #bbf7d0; }
+    .hero-description, .section-heading p, .feature-card p, .step p,
+    .privacy-point p, details p { color: #64748b; }
+    .downloader { background: #fff; border-color: #e5e7eb; box-shadow: 0 18px 55px #0f172a12; }
+    .platform-tabs { background: #f8fafc; border-color: #e2e8f0; }
+    .platform-tab { color: #475569; }
+    .platform-tab:hover { color: #166534; background: #f0fdf4; }
+    .platform-tab.active { color: #166534; border-color: #86efac; background: #dcfce7; box-shadow: none; }
+    .input-row { background: #fff; border-color: #cbd5e1; }
+    .input-row input { color: #111827; }
+    .paste-btn { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+    .paste-btn:hover { background: #e2e8f0; }
+    .privacy-note { color: #64748b; }
+    .media-preview { background: #f8fafc; border-color: #e2e8f0; }
+    .cover-wrap { background: #f1f5f9; border-color: #e2e8f0; }
+    .quality-label { color: #334155; }
+    .quality-select { background: #fff; border-color: #cbd5e1; color: #111827; }
+    .platform { background: #f8fafc; border-color: #e2e8f0; color: #475569; }
+
+    /* Editorial redesign: Features through FAQ */
+    section.content-section { padding: 58px 0; }
+    .section-heading { max-width: 720px; margin-bottom: 38px; }
+    .section-kicker { color: #15803d; letter-spacing: 1.6px; }
+    h2 { color: #111827; }
+    #features .feature-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;
+    }
+    #features .feature-card {
+      padding: 28px 26px; border: 0; border-radius: 0; background: transparent;
+      box-shadow: none; transform: none;
+    }
+    #features .feature-card + .feature-card { border-left: 1px solid #e5e7eb; }
+    #features .feature-card:hover { border-color: #e5e7eb; transform: none; }
+    #features .feature-card h3, #how-it-works .step h3,
+    .privacy-point h3 { color: #111827; }
+    #how-it-works .steps {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+      counter-reset: process;
+    }
+    #how-it-works .step {
+      position: relative; text-align: left; padding: 12px 24px 12px 0;
+      border-top: 2px solid #16a34a;
+    }
+    #how-it-works .step-number {
+      display: block; width: auto; height: auto; margin: 0 0 18px;
+      border: 0; border-radius: 0; background: transparent;
+      color: #16a34a; font-size: 13px; letter-spacing: 1.5px;
+    }
+    #privacy-copyright .privacy-points {
+      max-width: 900px; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 34px; border-top: 1px solid #e5e7eb;
+    }
+    #privacy-copyright .privacy-point {
+      padding: 23px 0; border: 0; border-radius: 0; background: transparent;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    #faq .faq-list { max-width: 820px; border-top: 1px solid #e5e7eb; }
+    #faq details {
+      margin: 0; border: 0; border-bottom: 1px solid #e5e7eb;
+      border-radius: 0; background: transparent;
+    }
+    #faq summary { padding: 21px 2px; color: #111827; font-size: 15px; }
+    #faq summary::after { color: #16a34a; font-size: 22px; font-weight: 400; }
+    #faq details p { padding: 0 34px 22px 2px; }
+    footer { background: #f8fafc; border-top-color: #e5e7eb; }
+    .footer-links { color: #475569; }
+    .footer-disclaimer, .footer-developers, .footer-copy { color: #64748b; }
+    .footer-developers { color: #334155; }
+
+    @media (max-width: 760px) {
+      section.content-section { padding: 42px 0; }
+      #features .feature-grid, #how-it-works .steps { grid-template-columns: 1fr; }
+      #features .feature-card { padding: 22px 4px; }
+      #features .feature-card + .feature-card { border-left: 0; border-top: 1px solid #e5e7eb; }
+      #how-it-works .step { padding: 18px 4px 20px; }
+      #privacy-copyright .privacy-points { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 
@@ -974,7 +1070,6 @@
 
       <div class="feature-grid">
         <article class="feature-card">
-          <div class="feature-icon">⚡</div>
           <h3>Simple process</h3>
           <p>
             Paste a supported link and let the connected service
@@ -983,7 +1078,6 @@
         </article>
 
         <article class="feature-card">
-          <div class="feature-icon">📱</div>
           <h3>Works on mobile</h3>
           <p>
             A responsive layout designed to fit smaller screens
@@ -992,7 +1086,6 @@
         </article>
 
         <article class="feature-card">
-          <div class="feature-icon">🛡️</div>
           <h3>Respect creators</h3>
           <p>
             Use media responsibly, follow platform rules and get

@@ -1030,6 +1030,40 @@
     }
     #how-it-works .step h3::before { content: counter(process) ". "; }
     #how-it-works .step { counter-increment: process; }
+
+    #how-it-works .steps {
+      display: block;
+      max-width: 900px;
+      margin: 0 auto;
+      counter-reset: process;
+    }
+    #how-it-works .step {
+      display: block;
+      margin: 0 0 5px;
+      padding: 0;
+      counter-increment: process;
+    }
+    #how-it-works .step h3 {
+      display: inline;
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      font-weight: 800;
+      color: #111827;
+    }
+    #how-it-works .step h3::before {
+      content: counter(process) ". ";
+      color: #111827;
+    }
+    #how-it-works .step p {
+      display: inline;
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #111827;
+    }
+    #how-it-works .step-number { display: none; }
+
     #features .feature-card p { display: inline; }
     #how-it-works .step { border: 0; padding: 12px 0 18px; }
     #how-it-works .step-number { margin-bottom: 8px; }
@@ -1176,19 +1210,16 @@
 
       <div class="steps">
         <article class="step">
-          <div class="step-number">01</div>
           <h3>Copy a link</h3>
           <p>Copy the link to the public post you want to access.</p>
         </article>
 
         <article class="step">
-          <div class="step-number">02</div>
           <h3>Paste or share it</h3>
           <p>Paste your link here and let U-Downloader find the available media.</p>
         </article>
 
         <article class="step">
-          <div class="step-number">03</div>
           <h3>Open your result</h3>
           <p>If the service supports the link, open the returned media.</p>
         </article>
@@ -1209,7 +1240,7 @@
       <div class="privacy-description">
         <p>• <strong>Respect Copyright:</strong> Only download and use content when you have permission or when the content is owned by you.</p>
         <p>• <strong>No Terms of Service Violations:</strong> Instagram has strict policies regarding content protection and privacy.</p>
-        <p>• <strong>No user data storage:</strong> U-Downloader is just a download support tool, it does not store any private information or data.</p>
+        <p>• <strong>No User Data Storage:</strong> U-Downloader is just a download support tool, it does not store any private information or data.</p>
         <p>• <strong>User Responsibility:</strong> Any action you take while using U-Downloader is your responsibility.</p>
       </div>
     </div>

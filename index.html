@@ -1072,6 +1072,16 @@
       line-height: 1.65;
       color: #111827;
     }
+    /* Tighter spacing between the three how-it-works lines */
+    #how-it-works .step {
+      margin: 0 0 2px;
+      padding: 0;
+    }
+    #how-it-works .step h3,
+    #how-it-works .step p {
+      line-height: 1.5;
+    }
+
     #how-it-works .step-number { display: none; }
 
     #features .feature-card p { display: inline; }
@@ -1136,9 +1146,6 @@
               autocomplete="url"
               required
             >
-            <button type="button" class="paste-btn" id="pasteBtn">
-              Paste
-            </button>
           </div>
 
           <button type="submit" class="download-btn" id="downloadBtn">
@@ -1325,7 +1332,6 @@
   const form = document.getElementById("downloadForm");
   const input = document.getElementById("mediaUrl");
   const button = document.getElementById("downloadBtn");
-  const pasteButton = document.getElementById("pasteBtn");
   const message = document.getElementById("message");
   const result = document.getElementById("resultLink");
   const preview = document.getElementById("mediaPreview");
@@ -1495,13 +1501,10 @@
       return;
     }
     if (requestInProgress || (url === lastFetchedUrl && preview.classList.contains("show"))) return;
-    try { localStorage.setItem("uDownloaderLastLink", url); } catch { /* Storage may be disabled. */ }
-
     clearTimeout(autoFetchTimer);
     clearResult();
     requestInProgress = true;
     button.disabled = true;
-    pasteButton.disabled = true;
     button.textContent = "Fetching media…";
     message.className = "message";
     try {
@@ -1530,49 +1533,9 @@
     } finally {
       requestInProgress = false;
       button.disabled = false;
-      pasteButton.disabled = false;
       button.textContent = "Get Media →";
     }
   }
-
-  pasteButton.addEventListener("click", async () => {
-    try {
-      if (!navigator.clipboard || !navigator.clipboard.readText) {
-        input.focus();
-        setMessage("Clipboard access is unavailable here. Paste the link into the box; it will fetch automatically.", "error");
-        return;
-      }
-      const clipboardText = await navigator.clipboard.readText();
-      if (!clipboardText.trim()) {
-        setMessage("Your clipboard is empty. Copy a supported public post link first.", "info");
-        return;
-      }
-      input.value = clipboardText.trim();
-      if (safePlatformUrl(input.value)) {
-        await processUrl(input.value);
-      } else {
-        setMessage("That clipboard text doesn't look like a supported Instagram, X, Pinterest, or TikTok link.", "error");
-      }
-    } catch {
-      input.focus();
-      setMessage("Clipboard access is blocked by your browser. Tap the input, long-press it, and choose Paste.", "info");
-    }
-  });
-
-  // When a user pastes or enters a complete link, start fetching automatically.
-  input.addEventListener("paste", () => {
-    setTimeout(() => {
-      const url = input.value.trim();
-      if (safePlatformUrl(url)) processUrl(url);
-    }, 50);
-  });
-
-  input.addEventListener("input", () => {
-    clearTimeout(autoFetchTimer);
-    const url = input.value.trim();
-    if (!safePlatformUrl(url)) return;
-    autoFetchTimer = setTimeout(() => processUrl(url), 650);
-  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1581,54 +1544,12 @@
 
   qualityDownload.addEventListener("click", downloadSelected);
 
-  // Read links sent by Android's Share menu through the installed PWA manifest.
-  function getSharedMediaUrl() {
-    const params = new URLSearchParams(window.location.search);
-    if (!params.has("share-target")) return "";
-
-    const candidates = [params.get("url"), params.get("text"), params.get("title")].filter(Boolean);
-    for (const candidate of candidates) {
-      const matches = candidate.match(/https?:\/\/[^\s<>"']+/gi) || [candidate.trim()];
-      for (const match of matches) {
-        const cleaned = match.replace(/[),.;!?]+$/, "");
-        if (safePlatformUrl(cleaned)) return cleaned;
-      }
-    }
-    return "";
-  }
-
-  async function handleSharedLink() {
-    const sharedUrl = getSharedMediaUrl();
-    if (!sharedUrl) return false;
-
-    input.value = sharedUrl;
-    // Remove shared post details from the address bar after capturing the link.
-    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
-    setMessage("Link received from Android Share. Fetching media…", "success");
-    await processUrl(sharedUrl);
-    return true;
-  }
-
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(() => {});
     });
   }
 
-  window.addEventListener("load", () => {
-    handleSharedLink().then((handled) => {
-      if (handled) return;
-      let savedUrl = "";
-      try { savedUrl = (localStorage.getItem("uDownloaderLastLink") || "").trim(); } catch { /* Storage may be disabled. */ }
-      if (savedUrl && safePlatformUrl(savedUrl)) {
-        input.value = savedUrl;
-        setMessage("Restored your last link. Fetching it again…", "info");
-        processUrl(savedUrl);
-        return;
-      }
-    }).catch(() => {});
-
-  });
 </script>
 </body>
 </html>

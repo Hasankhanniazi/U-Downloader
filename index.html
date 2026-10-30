@@ -1089,7 +1089,52 @@
     #how-it-works .step-number { margin-bottom: 8px; }
     .footer-disclaimer, .footer-developers, .footer-copy { color: #64748b; }
 
-  </style>
+  
+    /* Clean text-only platform selector */
+    .platform-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+    .platform-tab {
+      min-height: 42px;
+      padding: 10px 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .platform-tab:hover {
+      color: #15803d;
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+    .platform-tab.active {
+      color: #ffffff;
+      border-color: #16a34a;
+      background: #16a34a;
+      box-shadow: none;
+    }
+    @media (max-width: 520px) {
+      .platform-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .platform-tab {
+        min-height: 40px;
+        font-size: 13px;
+      }
+    }
+
+</style>
 </head>
 
 <body>
@@ -1126,10 +1171,10 @@
 
       <div class="downloader">
         <div class="platform-tabs" role="tablist" aria-label="Choose a platform">
-          <button type="button" class="platform-tab active" role="tab" aria-selected="true" data-platform="instagram">◎ Instagram</button>
-          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="x">✦ X / Twitter</button>
-          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="pinterest">📌 Pinterest</button>
-          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="tiktok">♪ TikTok</button>
+          <button type="button" class="platform-tab active" role="tab" aria-selected="true" data-platform="instagram">Instagram</button>
+          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="x">X / Twitter</button>
+          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="pinterest">Pinterest</button>
+          <button type="button" class="platform-tab" role="tab" aria-selected="false" data-platform="tiktok">TikTok</button>
         </div>
 
         <label class="input-label" for="mediaUrl">

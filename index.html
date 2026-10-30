@@ -956,6 +956,31 @@
     .footer-disclaimer, .footer-developers, .footer-copy { color: #64748b; }
     .footer-developers { color: #334155; }
 
+    /* FAQ green accordion styling */
+    #faq .faq-list { border: 0; }
+    #faq details {
+      margin: 0 0 12px;
+      border: 0;
+      border-radius: 12px;
+      background: #16a34a;
+      overflow: hidden;
+    }
+    #faq summary {
+      padding: 18px 20px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    #faq summary::after {
+      color: #ffffff;
+      font-weight: 700;
+    }
+    #faq details p {
+      padding: 0 20px 20px;
+      color: #ffffff;
+      font-weight: 400;
+    }
+
+
     @media (max-width: 760px) {
       section.content-section { padding: 42px 0; }
       #features .feature-grid, #how-it-works .steps { grid-template-columns: 1fr; }
@@ -1183,7 +1208,6 @@
       <div class="section-heading">
         <span class="section-kicker">Got questions?</span>
         <h2>Frequently asked questions</h2>
-        <p>Some quick information about using U-Downloader.</p>
       </div>
 
       <div class="faq-list">

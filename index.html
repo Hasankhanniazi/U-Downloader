@@ -954,6 +954,16 @@
     footer { background: #f8fafc; border-top-color: #e5e7eb; }
     .footer-links { color: #475569; }
     .footer-disclaimer, .footer-developers, .footer-copy { color: #64748b; }
+
+    /* Privacy and copyright text as one clean paragraph */
+    #privacy-copyright .privacy-points { display: block; max-width: 900px; border: 0; }
+    #privacy-copyright .privacy-point { display: none; }
+    #privacy-copyright .privacy-description { max-width: 900px; margin: 0 auto; }
+    #privacy-copyright .privacy-description p {
+      margin: 0; color: #111827; font-size: 14px; line-height: 1.9;
+    }
+    #privacy-copyright .privacy-description strong { font-weight: 700; }
+
     .footer-developers { color: #334155; }
 
 
@@ -1189,23 +1199,13 @@
         </p>
       </div>
 
-      <div class="privacy-points">
-        <article class="privacy-point">
-          <h3>Respect Copyright</h3>
-          <p>Only download and use content when you have permission or when the content is owned by you.</p>
-        </article>
-        <article class="privacy-point">
-          <h3>No Terms of Service Violations</h3>
-          <p>Instagram has strict policies regarding content protection and privacy.</p>
-        </article>
-        <article class="privacy-point">
-          <h3>No user data storage</h3>
-          <p>U-Downloader is just a download support tool, it does not store any private information or data.</p>
-        </article>
-        <article class="privacy-point">
-          <h3>User Responsibility</h3>
-          <p>Any action you take while using U-Downloader is your responsibility.</p>
-        </article>
+      <div class="privacy-description">
+        <p>
+          • <strong>Respect Copyright:</strong> Only download and use content when you have permission or when the content is owned by you.
+          • <strong>No Terms of Service Violations:</strong> Instagram has strict policies regarding content protection and privacy.
+          • <strong>No user data storage:</strong> U-Downloader is just a download support tool, it does not store any private information or data.
+          • <strong>User Responsibility:</strong> Any action you take while using U-Downloader is your responsibility.
+        </p>
       </div>
     </div>
   </section>
